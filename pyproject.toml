@@ -128,6 +128,12 @@ ignore = [
     "D213",   # multi-line-summary-second-line (conflicts with D212)
     "PLR0913", # too-many-arguments — automata constructors legitimately have many
     "ANN401", # dynamically-typed-expressions (Any) — allowed behind explicit comment
+    "RUF001", # ambiguous unicode char in string — bilingual UA/EN project uses Cyrillic freely
+    "RUF002", # ambiguous unicode char in docstring — same reason as RUF001
+    "RUF003", # ambiguous unicode char in comment — same reason as RUF001
+    "TC001",  # move first-party import into TYPE_CHECKING block — conflicts with pydantic
+    "TC002",  # move third-party import into TYPE_CHECKING block — conflicts with pydantic
+    "TC003",  # move stdlib import into TYPE_CHECKING block — conflicts with pydantic
 ]
 
 [tool.ruff.lint.pydocstyle]
