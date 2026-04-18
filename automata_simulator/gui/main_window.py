@@ -24,7 +24,20 @@ from PySide6.QtWidgets import (
 )
 
 from automata_simulator import __version__
-from automata_simulator.gui.canvas import AutomatonView
+from automata_simulator.core.models import Automaton
+from automata_simulator.gui.canvas import (
+    AutomatonView,
+    SceneConversionError,
+    automaton_to_scene,
+    scene_to_automaton,
+)
+from automata_simulator.gui.dialogs import (
+    ConvertToDFADialog,
+    FAToRegexDialog,
+    MinimizeDFADialog,
+    RegexToNFADialog,
+    RemoveEpsilonDialog,
+)
 from automata_simulator.gui.i18n import Locale, apply_locale
 from automata_simulator.gui.panels import SimulationPanel
 
@@ -108,10 +121,15 @@ class MainWindow(QMainWindow):
 
         # Algorithm menu
         self.action_alg_nfa_to_dfa = QAction(self)
+        self.action_alg_nfa_to_dfa.triggered.connect(self._run_nfa_to_dfa)
         self.action_alg_enfa_to_nfa = QAction(self)
+        self.action_alg_enfa_to_nfa.triggered.connect(self._run_enfa_to_nfa)
         self.action_alg_minimise = QAction(self)
+        self.action_alg_minimise.triggered.connect(self._run_minimize)
         self.action_alg_regex_to_nfa = QAction(self)
+        self.action_alg_regex_to_nfa.triggered.connect(self._run_regex_to_nfa)
         self.action_alg_nfa_to_regex = QAction(self)
+        self.action_alg_nfa_to_regex.triggered.connect(self._run_fa_to_regex)
         self.action_alg_cfg_to_pda = QAction(self)
         self.action_alg_pda_to_cfg = QAction(self)
 
@@ -238,6 +256,71 @@ class MainWindow(QMainWindow):
 
         self.menu_help.setTitle(self.tr("&Help"))
         self.action_about.setText(self.tr("&About"))
+
+    # ------------------------------------------------------------ algorithms
+    def _current_automaton(self) -> Automaton | None:
+        try:
+            return scene_to_automaton(self._canvas_view.automaton_scene)
+        except SceneConversionError as exc:
+            QMessageBox.warning(self, self.tr("Scene error"), str(exc))
+            return None
+
+    def _apply_automaton(self, automaton: Automaton) -> None:
+        automaton_to_scene(automaton, self._canvas_view.automaton_scene)
+        self._undo_stack.clear()
+
+    def _run_nfa_to_dfa(self) -> None:
+        automaton = self._current_automaton()
+        if automaton is None:
+            return
+        try:
+            dialog = ConvertToDFADialog(automaton, self)
+        except ValueError as exc:
+            QMessageBox.warning(self, self.tr("Unsupported"), str(exc))
+            return
+        if dialog.exec() and dialog.applied_automaton is not None:
+            self._apply_automaton(dialog.applied_automaton)
+
+    def _run_enfa_to_nfa(self) -> None:
+        automaton = self._current_automaton()
+        if automaton is None:
+            return
+        try:
+            dialog = RemoveEpsilonDialog(automaton, self)
+        except ValueError as exc:
+            QMessageBox.warning(self, self.tr("Unsupported"), str(exc))
+            return
+        if dialog.exec() and dialog.applied_automaton is not None:
+            self._apply_automaton(dialog.applied_automaton)
+
+    def _run_minimize(self) -> None:
+        automaton = self._current_automaton()
+        if automaton is None:
+            return
+        try:
+            dialog = MinimizeDFADialog(automaton, self)
+        except ValueError as exc:
+            QMessageBox.warning(self, self.tr("Unsupported"), str(exc))
+            return
+        if dialog.exec() and dialog.applied_automaton is not None:
+            self._apply_automaton(dialog.applied_automaton)
+
+    def _run_regex_to_nfa(self) -> None:
+        dialog = RegexToNFADialog(self)
+        if dialog.exec() and dialog.applied_automaton is not None:
+            self._apply_automaton(dialog.applied_automaton)
+
+    def _run_fa_to_regex(self) -> None:
+        automaton = self._current_automaton()
+        if automaton is None:
+            return
+        try:
+            dialog = FAToRegexDialog(automaton, self)
+        except ValueError as exc:
+            QMessageBox.warning(self, self.tr("Unsupported"), str(exc))
+            return
+        if dialog.exec() and dialog.applied_automaton is not None:
+            self._apply_automaton(dialog.applied_automaton)
 
     # ------------------------------------------------------------ about dialog
     def _show_about(self) -> None:

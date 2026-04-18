@@ -22,6 +22,8 @@ from automata_simulator.core.models import (
 )
 from automata_simulator.gui.canvas.scene import AutomatonScene
 
+_GRID_SPACING: float = 140.0
+
 
 class SceneConversionError(ValueError):
     """Raised when the scene can't be lowered to a valid automaton."""
@@ -116,3 +118,50 @@ def scene_to_automaton(  # noqa: PLR0912 — single-pass scene walker is cleares
         accepting_states=[s.state_id for s in state_items if s.is_accepting],
         transitions=transitions,
     )
+
+
+def automaton_to_scene(automaton: Automaton, scene: AutomatonScene) -> None:
+    """Replace ``scene``'s contents with the graphical view of ``automaton``.
+
+    Uses stored State.position when available; otherwise arranges states on
+    a simple grid.
+
+    Only FA-kind automata (DFA/NFA/ε-NFA) contribute labelled transitions;
+    for richer kinds the caller should use a specialised editor.
+    """
+    scene.clear_automaton()
+    positions = _compute_positions(automaton)
+    state_items = {}
+    for state in automaton.states:
+        x, y = positions[state.id]
+        item = scene.add_state(x, y, state_id=state.id)
+        item.set_initial(state.id == automaton.initial_state)
+        item.set_accepting(state.id in automaton.accepting_states)
+        if state.label is not None:
+            item.set_label(state.label)
+        state_items[state.id] = item
+    for tr in automaton.transitions:
+        label = tr.read if isinstance(tr, FATransition) else getattr(tr, "read", "")
+        src_id = getattr(tr, "source", "")
+        tgt_id = getattr(tr, "target", "")
+        src = state_items.get(src_id)
+        tgt = state_items.get(tgt_id)
+        if src is not None and tgt is not None:
+            scene.add_transition(src, tgt, label)
+
+
+def _compute_positions(automaton: Automaton) -> dict[str, tuple[float, float]]:
+    positions: dict[str, tuple[float, float]] = {}
+    col = 0
+    row = 0
+    columns_per_row = 4
+    for state in automaton.states:
+        if state.position is not None:
+            positions[state.id] = (state.position.x, state.position.y)
+            continue
+        positions[state.id] = (col * _GRID_SPACING, row * _GRID_SPACING)
+        col += 1
+        if col >= columns_per_row:
+            col = 0
+            row += 1
+    return positions

@@ -5,6 +5,7 @@ from __future__ import annotations
 from automata_simulator.gui.canvas.scene import AutomatonScene
 from automata_simulator.gui.canvas.scene_conversion import (
     SceneConversionError,
+    automaton_to_scene,
     scene_to_automaton,
 )
 from automata_simulator.gui.canvas.state_item import STATE_RADIUS, StateItem
@@ -26,5 +27,6 @@ __all__ = [
     "SceneConversionError",
     "StateItem",
     "TransitionItem",
+    "automaton_to_scene",
     "scene_to_automaton",
 ]
