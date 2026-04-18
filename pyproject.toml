@@ -1,0 +1,216 @@
+[build-system]
+requires = ["hatchling>=1.24"]
+build-backend = "hatchling.build"
+
+[project]
+name = "automata-simulator"
+dynamic = ["version"]
+description = "Modern desktop simulator for DFA / NFA / ε-NFA / Mealy / Moore / PDA / Turing machines — a JFLAP replacement."
+readme = "README.md"
+requires-python = ">=3.11"
+license = { text = "MIT" }
+authors = [{ name = "Maksym Kolesnyk", email = "kolesnyk.maksym@icloud.com" }]
+keywords = [
+    "automata",
+    "finite-state-machine",
+    "turing-machine",
+    "pushdown-automaton",
+    "formal-languages",
+    "jflap",
+    "education",
+    "simulator",
+]
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Intended Audience :: Education",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Topic :: Education",
+    "Topic :: Scientific/Engineering",
+    "Typing :: Typed",
+]
+dependencies = [
+    "pydantic>=2.6",
+    "click>=8.1",
+    "lark>=1.1",
+    "networkx>=3.2",
+    "pydot>=2.0",
+    "pillow>=10.2",
+    "imageio>=2.33",
+]
+
+[project.optional-dependencies]
+gui = ["PySide6>=6.6"]
+dev = [
+    "PySide6>=6.6",
+    "ruff>=0.5.0",
+    "mypy>=1.10",
+    "pytest>=8.0",
+    "pytest-cov>=5.0",
+    "pytest-qt>=4.4",
+    "hypothesis>=6.100",
+    "pre-commit>=3.7",
+    "types-pillow>=10.2",
+]
+docs = [
+    "mkdocs-material>=9.5",
+    "mkdocstrings[python]>=0.25",
+]
+
+[project.scripts]
+automata = "automata_simulator.cli.main:main"
+automata-sim = "automata_simulator.gui.main:main"
+
+[project.urls]
+Homepage = "https://github.com/kolesnyk-maksym/automata-simulator"
+Repository = "https://github.com/kolesnyk-maksym/automata-simulator"
+Issues = "https://github.com/kolesnyk-maksym/automata-simulator/issues"
+Documentation = "https://kolesnyk-maksym.github.io/automata-simulator"
+
+[tool.hatch.version]
+path = "automata_simulator/__init__.py"
+
+[tool.hatch.build.targets.wheel]
+packages = ["automata_simulator"]
+
+[tool.hatch.build.targets.sdist]
+include = [
+    "/automata_simulator",
+    "/tests",
+    "/examples",
+    "/docs",
+    "/README.md",
+    "/CHANGELOG.md",
+    "/CLAUDE.md",
+    "/pyproject.toml",
+]
+
+# ---------------------------------------------------------------------------
+# Ruff — lint and format.
+# ---------------------------------------------------------------------------
+[tool.ruff]
+line-length = 100
+target-version = "py311"
+extend-exclude = [
+    "automata_simulator/gui/i18n/*.py",  # generated Qt translation stubs
+    "build",
+    "dist",
+]
+
+[tool.ruff.lint]
+select = [
+    "E",    # pycodestyle errors
+    "W",    # pycodestyle warnings
+    "F",    # pyflakes
+    "I",    # isort
+    "N",    # pep8-naming
+    "UP",   # pyupgrade
+    "B",    # flake8-bugbear
+    "C4",   # flake8-comprehensions
+    "SIM",  # flake8-simplify
+    "PL",   # pylint rules
+    "RUF",  # ruff-specific
+    "D",    # pydocstyle
+    "ANN",  # flake8-annotations
+    "PT",   # flake8-pytest-style
+    "PTH",  # flake8-use-pathlib
+    "TCH",  # flake8-type-checking
+    "TID",  # flake8-tidy-imports
+    "ARG",  # flake8-unused-arguments
+    "RET",  # flake8-return
+]
+ignore = [
+    "D203",   # one-blank-line-before-class (conflicts with D211)
+    "D213",   # multi-line-summary-second-line (conflicts with D212)
+    "PLR0913", # too-many-arguments — automata constructors legitimately have many
+    "ANN401", # dynamically-typed-expressions (Any) — allowed behind explicit comment
+]
+
+[tool.ruff.lint.pydocstyle]
+convention = "google"
+
+[tool.ruff.lint.per-file-ignores]
+"tests/**/*.py" = [
+    "D",        # docstrings not required in tests
+    "ANN",      # type annotations not required in tests
+    "PLR2004",  # magic values allowed in tests
+    "S101",     # asserts required in tests
+]
+"automata_simulator/**/__init__.py" = ["D104"]  # module-level docstring optional for namespace packages
+
+[tool.ruff.format]
+quote-style = "double"
+indent-style = "space"
+line-ending = "lf"
+docstring-code-format = true
+
+# ---------------------------------------------------------------------------
+# mypy — strict type checking.
+# ---------------------------------------------------------------------------
+[tool.mypy]
+python_version = "3.11"
+strict = true
+warn_unreachable = true
+warn_return_any = true
+pretty = true
+show_error_codes = true
+show_column_numbers = true
+files = ["automata_simulator", "tests"]
+
+[[tool.mypy.overrides]]
+module = [
+    "pydot",
+    "pydot.*",
+    "pygraphviz",
+    "pygraphviz.*",
+    "imageio",
+    "imageio.*",
+    "networkx",
+    "networkx.*",
+    "lark",
+    "lark.*",
+]
+ignore_missing_imports = true
+
+# ---------------------------------------------------------------------------
+# pytest.
+# ---------------------------------------------------------------------------
+[tool.pytest.ini_options]
+minversion = "8.0"
+testpaths = ["tests"]
+addopts = [
+    "-ra",
+    "--strict-config",
+    "--strict-markers",
+    "--import-mode=importlib",
+]
+markers = [
+    "slow: marks tests as slow (deselect with -m 'not slow')",
+    "gui: marks tests that require a running Qt application",
+]
+filterwarnings = [
+    "error",
+    "ignore::DeprecationWarning:pkg_resources",
+]
+
+[tool.coverage.run]
+branch = true
+source = ["automata_simulator"]
+omit = [
+    "automata_simulator/gui/i18n/*",
+]
+
+[tool.coverage.report]
+fail_under = 85
+show_missing = true
+skip_covered = false
+exclude_lines = [
+    "pragma: no cover",
+    "raise NotImplementedError",
+    "if TYPE_CHECKING:",
+    "if __name__ == .__main__.:",
+]
