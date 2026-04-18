@@ -19,6 +19,7 @@ class Verdict(StrEnum):
     REJECTED_STUCK = "rejected:stuck"
     REJECTED_INVALID_SYMBOL = "rejected:invalid-input-symbol"
     REJECTED_EMPTY_CONFIG = "rejected:empty-configuration"
+    REJECTED_TIMEOUT = "rejected:step-limit-exceeded"
 
     @property
     def is_accepted(self) -> bool:
