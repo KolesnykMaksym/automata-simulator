@@ -12,7 +12,7 @@ runs on every ``QEvent.LanguageChange``.
 from __future__ import annotations
 
 from PySide6.QtCore import QEvent, Qt
-from PySide6.QtGui import QAction, QActionGroup, QKeySequence
+from PySide6.QtGui import QAction, QActionGroup, QKeySequence, QUndoStack
 from PySide6.QtWidgets import (
     QApplication,
     QDockWidget,
@@ -37,6 +37,7 @@ class MainWindow(QMainWindow):
         self._current_locale: Locale = Locale.EN
         self._canvas_view = AutomatonView()
         self.setCentralWidget(self._canvas_view)
+        self._undo_stack = QUndoStack(self)
         self._simulation_panel = SimulationPanel(self._canvas_view.automaton_scene)
         self._sim_dock = QDockWidget(self)
         self._sim_dock.setWidget(self._simulation_panel)
@@ -60,6 +61,11 @@ class MainWindow(QMainWindow):
         """The embedded :class:`SimulationPanel` widget."""
         return self._simulation_panel
 
+    @property
+    def undo_stack(self) -> QUndoStack:
+        """The editor's QUndoStack (Ctrl+Z / Ctrl+Y)."""
+        return self._undo_stack
+
     # ------------------------------------------------------------ menu building
     def _build_actions(self) -> None:
         # File menu
@@ -75,10 +81,10 @@ class MainWindow(QMainWindow):
         self.action_quit.setShortcut(QKeySequence.StandardKey.Quit)
         self.action_quit.triggered.connect(self.close)
 
-        # Edit menu
-        self.action_undo = QAction(self)
+        # Edit menu — wire directly into the QUndoStack.
+        self.action_undo = self._undo_stack.createUndoAction(self)
         self.action_undo.setShortcut(QKeySequence.StandardKey.Undo)
-        self.action_redo = QAction(self)
+        self.action_redo = self._undo_stack.createRedoAction(self)
         self.action_redo.setShortcut(QKeySequence.StandardKey.Redo)
 
         # View → Language actions (mutually exclusive)
