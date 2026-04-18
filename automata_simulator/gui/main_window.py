@@ -23,6 +23,7 @@ from PySide6.QtWidgets import (
 )
 
 from automata_simulator import __version__
+from automata_simulator.gui.canvas import AutomatonView
 from automata_simulator.gui.i18n import Locale, apply_locale
 
 
@@ -32,11 +33,18 @@ class MainWindow(QMainWindow):
     def __init__(self, parent: QWidget | None = None) -> None:
         super().__init__(parent)
         self._current_locale: Locale = Locale.EN
+        self._canvas_view = AutomatonView()
+        self.setCentralWidget(self._canvas_view)
         self._build_actions()
         self._build_menu_bar()
         self.setStatusBar(QStatusBar(self))
         self.resize(960, 640)
         self.retranslate_ui()
+
+    @property
+    def canvas_view(self) -> AutomatonView:
+        """The central :class:`AutomatonView` widget."""
+        return self._canvas_view
 
     # ------------------------------------------------------------ menu building
     def _build_actions(self) -> None:
