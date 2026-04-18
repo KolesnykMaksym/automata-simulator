@@ -1,0 +1,61 @@
+site_name: Automata Simulator
+site_description: >-
+  JFLAP-style educational simulator for DFA / NFA / ε-NFA / Mealy / Moore /
+  PDA / Turing machines.
+site_url: https://kolesnyk-maksym.github.io/automata-simulator/
+repo_url: https://github.com/kolesnyk-maksym/automata-simulator
+repo_name: kolesnyk-maksym/automata-simulator
+copyright: "© 2026 Maksym Kolesnyk — MIT licensed"
+
+theme:
+  name: material
+  features:
+    - navigation.sections
+    - navigation.top
+    - navigation.tracking
+    - search.suggest
+    - search.highlight
+    - content.code.copy
+    - toc.follow
+  palette:
+    - media: "(prefers-color-scheme: light)"
+      scheme: default
+      primary: indigo
+      accent: indigo
+    - media: "(prefers-color-scheme: dark)"
+      scheme: slate
+      primary: indigo
+      accent: indigo
+
+plugins:
+  - search
+  - mkdocstrings:
+      default_handler: python
+      handlers:
+        python:
+          options:
+            docstring_style: google
+            show_source: false
+            show_root_heading: true
+            members_order: source
+
+nav:
+  - Overview: index.md
+  - Usage:
+      - Quickstart: usage.md
+      - Command-line interface: cli.md
+  - Architecture: architecture.md
+  - Algorithms: algorithms.md
+  - API reference:
+      - Models: api-models.md
+      - Simulators: api-simulators.md
+      - Algorithms: api-algorithms.md
+
+markdown_extensions:
+  - admonition
+  - toc:
+      permalink: true
+  - pymdownx.highlight:
+      anchor_linenums: true
+  - pymdownx.superfences
+  - pymdownx.inlinehilite
