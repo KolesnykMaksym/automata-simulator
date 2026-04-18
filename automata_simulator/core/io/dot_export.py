@@ -39,13 +39,11 @@ def to_dot(automaton: Automaton) -> str:
     if automaton.type is AutomatonType.MOORE:
         for state in automaton.states:
             if state.moore_output is not None:
-                shape = (
-                    "doublecircle" if state.id in automaton.accepting_states else "circle"
-                )
+                shape = "doublecircle" if state.id in automaton.accepting_states else "circle"
                 lines.append(
                     f'  "{_escape(state.id)}" '
                     f'[label="{_escape(state.id)}\\n/{_escape(state.moore_output)}", '
-                    f'shape={shape}];',
+                    f"shape={shape}];",
                 )
     # Invisible entry node + initial arrow.
     lines.append('  __entry__ [shape=none, label=""];')
@@ -77,9 +75,7 @@ def _transition_label(tr: Transition) -> str:
         push = "".join(tr.push) if tr.push else "ε"
         return f"{tr.read},{pop}/{push}"
     if isinstance(tr, TMTransition):
-        pairs = [
-            f"{r}/{w},{m.value}" for r, w, m in zip(tr.read, tr.write, tr.move, strict=True)
-        ]
+        pairs = [f"{r}/{w},{m.value}" for r, w, m in zip(tr.read, tr.write, tr.move, strict=True)]
         return " | ".join(pairs)
     raise TypeError(f"Unknown transition kind: {type(tr).__name__}")
 

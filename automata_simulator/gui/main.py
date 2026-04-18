@@ -1,21 +1,34 @@
-"""GUI entry point. Stub to be filled out in Stage 9."""
+"""GUI entry point — launches QApplication + :class:`MainWindow`.
+
+Summary (UA): Точка входу GUI — створює QApplication і показує головне вікно.
+Summary (EN): Creates the QApplication, instantiates the MainWindow and
+starts Qt's event loop.
+"""
 
 from __future__ import annotations
 
 import sys
 
+from PySide6.QtWidgets import QApplication
 
-def main() -> int:
-    """Entry point for the ``automata-sim`` command.
+from automata_simulator.gui.main_window import MainWindow
 
-    Summary (UA): Заглушка GUI — буде реалізовано на Етапі 9.
-    Summary (EN): GUI stub — scheduled for implementation in Stage 9.
+
+def main(argv: list[str] | None = None) -> int:
+    """Entry point for the ``automata-sim`` console script.
+
+    Args:
+        argv: Command-line arguments (defaults to ``sys.argv``).
 
     Returns:
-        Process exit code.
+        The Qt application's exit code.
     """
-    sys.stdout.write("automata-sim GUI — not yet implemented (see Stage 9 in CLAUDE.md)\n")
-    return 0
+    args = list(sys.argv if argv is None else argv)
+    app = QApplication.instance() or QApplication(args)
+    window = MainWindow()
+    window.show()
+    assert isinstance(app, QApplication)
+    return int(app.exec())
 
 
 if __name__ == "__main__":  # pragma: no cover

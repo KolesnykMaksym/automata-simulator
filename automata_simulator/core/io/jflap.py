@@ -271,7 +271,8 @@ def _nonempty(text: str | None) -> str | None:
 
 
 def _classify_automaton_type(  # noqa: PLR0911 — one return per JFLAP type tag is readable
-    jflap_type: str, transitions: list[Transition],
+    jflap_type: str,
+    transitions: list[Transition],
 ) -> AutomatonType:
     """For JFLAP ``fa`` type, narrow to DFA / NFA / EPSILON_NFA heuristically."""
     if jflap_type == "mealy":

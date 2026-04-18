@@ -51,8 +51,7 @@ def _load_automaton(path: Path) -> Automaton:
     if suffix in {".jff", ".xml"}:
         return load_jff(path)
     raise click.BadParameter(
-        f"Unsupported input extension: {suffix!r} "
-        f"(expected .json, .jff, or .xml)",
+        f"Unsupported input extension: {suffix!r} (expected .json, .jff, or .xml)",
     )
 
 
@@ -68,8 +67,7 @@ def _save_automaton(automaton: Automaton, path: Path) -> None:
         save_dot(automaton, path)
         return
     raise click.BadParameter(
-        f"Unsupported output extension: {suffix!r} "
-        f"(expected .json, .jff, or .dot)",
+        f"Unsupported output extension: {suffix!r} (expected .json, .jff, or .dot)",
     )
 
 
@@ -137,8 +135,7 @@ def convert(source: Path, target: str, output: Path) -> None:
     if target_lower == "dfa":
         if automaton.type not in (AutomatonType.NFA, AutomatonType.EPSILON_NFA):
             raise click.ClickException(
-                f"Cannot convert {automaton.type.value!r} to DFA "
-                "(expected NFA or ε-NFA)",
+                f"Cannot convert {automaton.type.value!r} to DFA (expected NFA or ε-NFA)",
             )
         result = nfa_to_dfa(automaton).dfa
     else:  # target_lower == "nfa"

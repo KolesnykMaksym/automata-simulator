@@ -8,7 +8,7 @@ from click.testing import CliRunner
 
 import automata_simulator
 from automata_simulator.cli.main import main as cli_main
-from automata_simulator.gui.main import main as gui_main
+from automata_simulator.gui import main as gui_main_module
 
 
 def test_version_is_pep440_string() -> None:
@@ -22,5 +22,7 @@ def test_cli_help_runs() -> None:
     assert "automata" in result.output.lower()
 
 
-def test_gui_stub_runs() -> None:
-    assert gui_main() == 0
+def test_gui_entry_point_is_callable() -> None:
+    # We don't actually invoke main() — it would start Qt's event loop.
+    # The MainWindow itself is exercised by tests/gui/test_main_window.py.
+    assert callable(gui_main_module.main)

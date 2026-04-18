@@ -102,13 +102,16 @@ class TestSimulate:
 
     def test_step_flag_prints_steps(self, runner: CliRunner, dfa_json: Path) -> None:
         result = runner.invoke(
-            main, ["simulate", str(dfa_json), "-i", "ab", "--step"],
+            main,
+            ["simulate", str(dfa_json), "-i", "ab", "--step"],
         )
         assert result.exit_code == 0
         assert "[0]" in result.output
 
     def test_unsupported_extension_fails(
-        self, runner: CliRunner, tmp_path: Path,
+        self,
+        runner: CliRunner,
+        tmp_path: Path,
     ) -> None:
         path = tmp_path / "x.unknown"
         path.write_text("{}")
@@ -118,13 +121,16 @@ class TestSimulate:
 
 class TestConvert:
     def test_nfa_to_dfa_round_trip(
-        self, runner: CliRunner, tmp_path: Path,
+        self,
+        runner: CliRunner,
+        tmp_path: Path,
     ) -> None:
         src = tmp_path / "nfa.json"
         save_json(_nfa_ends_in_01(), src)
         dst = tmp_path / "dfa.json"
         result = runner.invoke(
-            main, ["convert", str(src), "--to", "dfa", "-o", str(dst)],
+            main,
+            ["convert", str(src), "--to", "dfa", "-o", str(dst)],
         )
         assert result.exit_code == 0, result.output
         # The produced DFA file must load.
@@ -136,23 +142,30 @@ class TestConvert:
         save_json(_enfa(), src)
         dst = tmp_path / "nfa.json"
         result = runner.invoke(
-            main, ["convert", str(src), "--to", "nfa", "-o", str(dst)],
+            main,
+            ["convert", str(src), "--to", "nfa", "-o", str(dst)],
         )
         assert result.exit_code == 0, result.output
 
     def test_rejects_dfa_to_dfa_conversion(
-        self, runner: CliRunner, dfa_json: Path, tmp_path: Path,
+        self,
+        runner: CliRunner,
+        dfa_json: Path,
+        tmp_path: Path,
     ) -> None:
         dst = tmp_path / "out.json"
         result = runner.invoke(
-            main, ["convert", str(dfa_json), "--to", "dfa", "-o", str(dst)],
+            main,
+            ["convert", str(dfa_json), "--to", "dfa", "-o", str(dst)],
         )
         assert result.exit_code != 0  # DFA→DFA is rejected
 
 
 class TestMinimize:
     def test_minimize_drops_equivalent_states(
-        self, runner: CliRunner, tmp_path: Path,
+        self,
+        runner: CliRunner,
+        tmp_path: Path,
     ) -> None:
         src = tmp_path / "dfa.json"
         save_json(_dfa_ends_in_ab(), src)
@@ -171,7 +184,10 @@ class TestMinimize:
 
 class TestBatchTest:
     def test_csv_report(
-        self, runner: CliRunner, dfa_json: Path, tmp_path: Path,
+        self,
+        runner: CliRunner,
+        dfa_json: Path,
+        tmp_path: Path,
     ) -> None:
         inputs = tmp_path / "inputs.txt"
         inputs.write_text("ab\nba\naab\n", encoding="utf-8")
@@ -193,7 +209,10 @@ class TestBatchTest:
         assert "ab,accepted,True" in content
 
     def test_json_report(
-        self, runner: CliRunner, dfa_json: Path, tmp_path: Path,
+        self,
+        runner: CliRunner,
+        dfa_json: Path,
+        tmp_path: Path,
     ) -> None:
         inputs = tmp_path / "inputs.txt"
         inputs.write_text("ab\nba\n", encoding="utf-8")
@@ -220,17 +239,22 @@ class TestExport:
     def test_dot_export(self, runner: CliRunner, dfa_json: Path, tmp_path: Path) -> None:
         dst = tmp_path / "g.dot"
         result = runner.invoke(
-            main, ["export", str(dfa_json), "--format", "dot", "-o", str(dst)],
+            main,
+            ["export", str(dfa_json), "--format", "dot", "-o", str(dst)],
         )
         assert result.exit_code == 0
         content = dst.read_text()
         assert "digraph" in content
 
     def test_unsupported_format_rejected_by_click(
-        self, runner: CliRunner, dfa_json: Path, tmp_path: Path,
+        self,
+        runner: CliRunner,
+        dfa_json: Path,
+        tmp_path: Path,
     ) -> None:
         dst = tmp_path / "g.xyz"
         result = runner.invoke(
-            main, ["export", str(dfa_json), "--format", "bogus", "-o", str(dst)],
+            main,
+            ["export", str(dfa_json), "--format", "bogus", "-o", str(dst)],
         )
         assert result.exit_code != 0
