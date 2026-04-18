@@ -148,6 +148,7 @@ convention = "google"
     "S101",     # asserts required in tests
 ]
 "automata_simulator/**/__init__.py" = ["D104"]  # module-level docstring optional for namespace packages
+"scripts/**/*.py" = ["D103"]  # helper scripts — self-documenting factories don't need per-function docs
 
 [tool.ruff.format]
 quote-style = "double"

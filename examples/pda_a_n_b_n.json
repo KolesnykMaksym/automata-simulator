@@ -1,0 +1,116 @@
+{
+  "type": "pda",
+  "name": "a-n-b-n",
+  "states": [
+    {
+      "id": "q0",
+      "label": null,
+      "is_initial": true,
+      "is_accepting": false,
+      "moore_output": null,
+      "position": {
+        "x": 0.0,
+        "y": 0.0
+      }
+    },
+    {
+      "id": "q1",
+      "label": null,
+      "is_initial": false,
+      "is_accepting": false,
+      "moore_output": null,
+      "position": {
+        "x": 180.0,
+        "y": 0.0
+      }
+    },
+    {
+      "id": "qf",
+      "label": null,
+      "is_initial": false,
+      "is_accepting": true,
+      "moore_output": null,
+      "position": {
+        "x": 360.0,
+        "y": 0.0
+      }
+    }
+  ],
+  "alphabet": [
+    "a",
+    "b"
+  ],
+  "transitions": [
+    {
+      "source": "q0",
+      "target": "qf",
+      "kind": "pda",
+      "read": "ε",
+      "pop": "Z",
+      "push": [
+        "Z"
+      ]
+    },
+    {
+      "source": "q0",
+      "target": "q0",
+      "kind": "pda",
+      "read": "a",
+      "pop": "Z",
+      "push": [
+        "A",
+        "Z"
+      ]
+    },
+    {
+      "source": "q0",
+      "target": "q0",
+      "kind": "pda",
+      "read": "a",
+      "pop": "A",
+      "push": [
+        "A",
+        "A"
+      ]
+    },
+    {
+      "source": "q0",
+      "target": "q1",
+      "kind": "pda",
+      "read": "b",
+      "pop": "A",
+      "push": []
+    },
+    {
+      "source": "q1",
+      "target": "q1",
+      "kind": "pda",
+      "read": "b",
+      "pop": "A",
+      "push": []
+    },
+    {
+      "source": "q1",
+      "target": "qf",
+      "kind": "pda",
+      "read": "ε",
+      "pop": "Z",
+      "push": [
+        "Z"
+      ]
+    }
+  ],
+  "initial_state": "q0",
+  "accepting_states": [
+    "qf"
+  ],
+  "output_alphabet": null,
+  "stack_alphabet": [
+    "Z",
+    "A"
+  ],
+  "stack_start": "Z",
+  "tape_alphabet": null,
+  "blank_symbol": "□",
+  "tape_count": 1
+}

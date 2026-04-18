@@ -1,0 +1,96 @@
+{
+  "type": "nfa",
+  "name": "ends-in-abb",
+  "states": [
+    {
+      "id": "q0",
+      "label": null,
+      "is_initial": true,
+      "is_accepting": false,
+      "moore_output": null,
+      "position": {
+        "x": 0.0,
+        "y": 0.0
+      }
+    },
+    {
+      "id": "q1",
+      "label": null,
+      "is_initial": false,
+      "is_accepting": false,
+      "moore_output": null,
+      "position": {
+        "x": 140.0,
+        "y": 0.0
+      }
+    },
+    {
+      "id": "q2",
+      "label": null,
+      "is_initial": false,
+      "is_accepting": false,
+      "moore_output": null,
+      "position": {
+        "x": 280.0,
+        "y": 0.0
+      }
+    },
+    {
+      "id": "q3",
+      "label": null,
+      "is_initial": false,
+      "is_accepting": true,
+      "moore_output": null,
+      "position": {
+        "x": 420.0,
+        "y": 0.0
+      }
+    }
+  ],
+  "alphabet": [
+    "a",
+    "b"
+  ],
+  "transitions": [
+    {
+      "source": "q0",
+      "target": "q0",
+      "kind": "fa",
+      "read": "a"
+    },
+    {
+      "source": "q0",
+      "target": "q0",
+      "kind": "fa",
+      "read": "b"
+    },
+    {
+      "source": "q0",
+      "target": "q1",
+      "kind": "fa",
+      "read": "a"
+    },
+    {
+      "source": "q1",
+      "target": "q2",
+      "kind": "fa",
+      "read": "b"
+    },
+    {
+      "source": "q2",
+      "target": "q3",
+      "kind": "fa",
+      "read": "b"
+    }
+  ],
+  "initial_state": "q0",
+  "accepting_states": [
+    "q3"
+  ],
+  "output_alphabet": null,
+  "stack_alphabet": null,
+  "stack_start": null,
+  "tape_alphabet": null,
+  "blank_symbol": "□",
+  "tape_count": 1
+}
