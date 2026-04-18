@@ -36,6 +36,14 @@ TRANSLATIONS_UA: dict[str, str] = {
     "S&tep": "&Крок",
     "&Pause": "&Пауза",
     "R&eset": "С&кинути",
+    "Speed": "Швидкість",
+    "Speed: {x:.1f}×": "Швидкість: {x:.1f}×",
+    "Input string…": "Вхідний рядок…",
+    "Verdict: {v}": "Вердикт: {v}",
+    "Error: {msg}": "Помилка: {msg}",
+    "Simulation of {kind} automata is not yet supported in the GUI": (
+        "Симуляція автоматів {kind} поки не підтримується в GUI"
+    ),
     # Algorithms menu
     "&Algorithms": "&Алгоритми",
     "NFA → DFA": "NFA → DFA",

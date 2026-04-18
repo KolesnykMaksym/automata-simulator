@@ -11,10 +11,11 @@ runs on every ``QEvent.LanguageChange``.
 
 from __future__ import annotations
 
-from PySide6.QtCore import QEvent
+from PySide6.QtCore import QEvent, Qt
 from PySide6.QtGui import QAction, QActionGroup, QKeySequence
 from PySide6.QtWidgets import (
     QApplication,
+    QDockWidget,
     QMainWindow,
     QMenu,
     QMessageBox,
@@ -25,6 +26,7 @@ from PySide6.QtWidgets import (
 from automata_simulator import __version__
 from automata_simulator.gui.canvas import AutomatonView
 from automata_simulator.gui.i18n import Locale, apply_locale
+from automata_simulator.gui.panels import SimulationPanel
 
 
 class MainWindow(QMainWindow):
@@ -35,16 +37,28 @@ class MainWindow(QMainWindow):
         self._current_locale: Locale = Locale.EN
         self._canvas_view = AutomatonView()
         self.setCentralWidget(self._canvas_view)
+        self._simulation_panel = SimulationPanel(self._canvas_view.automaton_scene)
+        self._sim_dock = QDockWidget(self)
+        self._sim_dock.setWidget(self._simulation_panel)
+        self._sim_dock.setAllowedAreas(
+            Qt.DockWidgetArea.RightDockWidgetArea | Qt.DockWidgetArea.LeftDockWidgetArea,
+        )
+        self.addDockWidget(Qt.DockWidgetArea.RightDockWidgetArea, self._sim_dock)
         self._build_actions()
         self._build_menu_bar()
         self.setStatusBar(QStatusBar(self))
-        self.resize(960, 640)
+        self.resize(1120, 720)
         self.retranslate_ui()
 
     @property
     def canvas_view(self) -> AutomatonView:
         """The central :class:`AutomatonView` widget."""
         return self._canvas_view
+
+    @property
+    def simulation_panel(self) -> SimulationPanel:
+        """The embedded :class:`SimulationPanel` widget."""
+        return self._simulation_panel
 
     # ------------------------------------------------------------ menu building
     def _build_actions(self) -> None:
@@ -182,6 +196,8 @@ class MainWindow(QMainWindow):
         """Refresh every user-visible string based on the current locale."""
         self.setWindowTitle(self.tr("Automata Simulator"))
         self.statusBar().showMessage(self.tr("Ready"))
+        self._sim_dock.setWindowTitle(self.tr("&Simulation"))
+        self._simulation_panel.retranslate_ui()
 
         self.menu_file.setTitle(self.tr("&File"))
         self.action_new.setText(self.tr("&New"))
