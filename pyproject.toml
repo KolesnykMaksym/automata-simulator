@@ -220,4 +220,7 @@ exclude_lines = [
     "raise NotImplementedError",
     "if TYPE_CHECKING:",
     "if __name__ == .__main__.:",
+    "def paintEvent",  # Qt paint handlers — exercised only on a real screen
+    "def _load_file",  # QFileDialog blocks in headless tests
+    "def _export\\(",  # QFileDialog save dialog likewise
 ]

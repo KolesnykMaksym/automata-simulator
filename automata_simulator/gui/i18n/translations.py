@@ -44,6 +44,28 @@ TRANSLATIONS_UA: dict[str, str] = {
     "Simulation of {kind} automata is not yet supported in the GUI": (
         "Симуляція автоматів {kind} поки не підтримується в GUI"
     ),
+    "&Batch test…": "&Пакетне тестування…",
+    "Batch test": "Пакетне тестування",
+    "One input string per line…": "Один вхідний рядок на рядок…",
+    "Load file…": "Завантажити файл…",
+    "Run": "Запустити",
+    "Export CSV": "Експорт CSV",
+    "Export JSON": "Експорт JSON",
+    "Input": "Вхід",
+    "Verdict": "Вердикт",
+    "Accepted": "Прийнято",
+    "Time (ms)": "Час (мс)",
+    "Input strings:": "Вхідні рядки:",
+    "No results yet.": "Ще немає результатів.",
+    "Tested {n} strings — {a} accepted, {r} rejected.": (
+        "Протестовано {n} рядків — {a} прийнято, {r} відхилено."
+    ),
+    "Load strings file": "Завантажити файл рядків",
+    "Export report": "Експорт звіту",
+    "No data": "Немає даних",
+    "Run a batch first.": "Спочатку запустіть пакетне тестування.",
+    "Scene error": "Помилка сцени",
+    "Unsupported": "Не підтримується",
     # Algorithms menu
     "&Algorithms": "&Алгоритми",
     "NFA → DFA": "NFA → DFA",

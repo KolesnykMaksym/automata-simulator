@@ -9,8 +9,14 @@ from automata_simulator.gui.dialogs.algorithm_dialogs import (
     RegexToNFADialog,
     RemoveEpsilonDialog,
 )
+from automata_simulator.gui.dialogs.batch_test_dialog import (
+    BatchResult,
+    BatchTestDialog,
+)
 
 __all__ = [
+    "BatchResult",
+    "BatchTestDialog",
     "ConvertToDFADialog",
     "FAToRegexDialog",
     "MinimizeDFADialog",

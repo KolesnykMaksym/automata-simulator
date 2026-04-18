@@ -32,6 +32,7 @@ from automata_simulator.gui.canvas import (
     scene_to_automaton,
 )
 from automata_simulator.gui.dialogs import (
+    BatchTestDialog,
     ConvertToDFADialog,
     FAToRegexDialog,
     MinimizeDFADialog,
@@ -118,6 +119,8 @@ class MainWindow(QMainWindow):
         self.action_sim_step = QAction(self)
         self.action_sim_pause = QAction(self)
         self.action_sim_reset = QAction(self)
+        self.action_batch_test = QAction(self)
+        self.action_batch_test.triggered.connect(self._run_batch_test)
 
         # Algorithm menu
         self.action_alg_nfa_to_dfa = QAction(self)
@@ -167,6 +170,8 @@ class MainWindow(QMainWindow):
         self.menu_sim.addAction(self.action_sim_step)
         self.menu_sim.addAction(self.action_sim_pause)
         self.menu_sim.addAction(self.action_sim_reset)
+        self.menu_sim.addSeparator()
+        self.menu_sim.addAction(self.action_batch_test)
         menubar.addMenu(self.menu_sim)
 
         self.menu_algorithms = QMenu(self)
@@ -244,6 +249,7 @@ class MainWindow(QMainWindow):
         self.action_sim_step.setText(self.tr("S&tep"))
         self.action_sim_pause.setText(self.tr("&Pause"))
         self.action_sim_reset.setText(self.tr("R&eset"))
+        self.action_batch_test.setText(self.tr("&Batch test…"))
 
         self.menu_algorithms.setTitle(self.tr("&Algorithms"))
         self.action_alg_nfa_to_dfa.setText(self.tr("NFA → DFA"))
@@ -321,6 +327,10 @@ class MainWindow(QMainWindow):
             return
         if dialog.exec() and dialog.applied_automaton is not None:
             self._apply_automaton(dialog.applied_automaton)
+
+    def _run_batch_test(self) -> None:
+        dialog = BatchTestDialog(self._canvas_view.automaton_scene, self)
+        dialog.exec()
 
     # ------------------------------------------------------------ about dialog
     def _show_about(self) -> None:
