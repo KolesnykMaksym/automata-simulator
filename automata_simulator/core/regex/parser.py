@@ -9,8 +9,6 @@ Summary (EN): Lark-based regex parser. Supports concatenation, ``|``, ``*``,
 
 from __future__ import annotations
 
-from typing import cast
-
 from lark import Lark, Token, Transformer
 
 from automata_simulator.core.regex.ast import (
@@ -62,7 +60,10 @@ class _RegexTransformer(Transformer[Token, RegexNode]):
         return result
 
     def post(self, items: list[RegexNode | Token]) -> RegexNode:
-        node = cast("RegexNode", items[0])
+        first = items[0]
+        if isinstance(first, Token):  # defensive — lark gives us a RegexNode here
+            raise ValueError(f"Unexpected token in post rule: {first!r}")
+        node: RegexNode = first
         for op_tok in items[1:]:
             op = str(op_tok)
             if op == "*":
@@ -101,6 +102,7 @@ def parse_regex(text: str) -> RegexNode:
     """
     try:
         tree = _parser.parse(text)
-        return cast("RegexNode", _transformer.transform(tree))
+        result = _transformer.transform(tree)
     except Exception as exc:  # Lark raises a variety of exceptions.
         raise ValueError(f"Invalid regex {text!r}: {exc}") from exc
+    return result
