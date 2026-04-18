@@ -124,6 +124,7 @@ select = [
     "RET",  # flake8-return
 ]
 ignore = [
+    "D107",   # missing-docstring-in-init — Google style documents init in the class docstring
     "D203",   # one-blank-line-before-class (conflicts with D211)
     "D213",   # multi-line-summary-second-line (conflicts with D212)
     "PLR0913", # too-many-arguments — automata constructors legitimately have many
