@@ -61,3 +61,6 @@ automata_simulator/gui/i18n/*.qm
 
 # OS
 Thumbs.db
+
+# Local-only project prompt (never published)
+CLAUDE.md
