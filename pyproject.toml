@@ -66,10 +66,10 @@ automata = "automata_simulator.cli.main:main"
 automata-sim = "automata_simulator.gui.main:main"
 
 [project.urls]
-Homepage = "https://github.com/kolesnyk-maksym/automata-simulator"
-Repository = "https://github.com/kolesnyk-maksym/automata-simulator"
-Issues = "https://github.com/kolesnyk-maksym/automata-simulator/issues"
-Documentation = "https://kolesnyk-maksym.github.io/automata-simulator"
+Homepage = "https://github.com/KolesnykMaksym/automata-simulator"
+Repository = "https://github.com/KolesnykMaksym/automata-simulator"
+Issues = "https://github.com/KolesnykMaksym/automata-simulator/issues"
+Documentation = "https://KolesnykMaksym.github.io/automata-simulator"
 
 [tool.hatch.version]
 path = "automata_simulator/__init__.py"

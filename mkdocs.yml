@@ -2,9 +2,9 @@ site_name: Automata Simulator
 site_description: >-
   JFLAP-style educational simulator for DFA / NFA / ε-NFA / Mealy / Moore /
   PDA / Turing machines.
-site_url: https://kolesnyk-maksym.github.io/automata-simulator/
-repo_url: https://github.com/kolesnyk-maksym/automata-simulator
-repo_name: kolesnyk-maksym/automata-simulator
+site_url: https://KolesnykMaksym.github.io/automata-simulator/
+repo_url: https://github.com/KolesnykMaksym/automata-simulator
+repo_name: KolesnykMaksym/automata-simulator
 copyright: "© 2026 Maksym Kolesnyk — MIT licensed"
 
 theme:

@@ -5,7 +5,7 @@ Thanks for taking the time to make **Automata Simulator** better.
 ## Local setup
 
 ```bash
-git clone https://github.com/kolesnyk-maksym/automata-simulator.git
+git clone https://github.com/KolesnykMaksym/automata-simulator.git
 cd automata-simulator
 uv venv --python 3.13
 source .venv/bin/activate
