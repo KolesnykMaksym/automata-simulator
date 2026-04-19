@@ -98,11 +98,7 @@ class TransitionItem(QGraphicsItem):
         """Draw the line/arrow/loop and render the label."""
         painter.setRenderHint(QPainter.RenderHint.Antialiasing)
         palette = widget.palette() if widget is not None else QApplication.palette()
-        pen_colour = (
-            _HIGHLIGHT_COLOUR
-            if self._highlighted
-            else palette.windowText().color()
-        )
+        pen_colour = _HIGHLIGHT_COLOUR if self._highlighted else palette.windowText().color()
         if self.isSelected():
             pen_colour = _SELECTED_COLOUR
         painter.setPen(QPen(pen_colour, 2.0))
@@ -112,7 +108,8 @@ class TransitionItem(QGraphicsItem):
             self._paint_arrow(painter)
 
     def mouseDoubleClickEvent(  # noqa: N802 — Qt override
-        self, event: QGraphicsSceneMouseEvent,
+        self,
+        event: QGraphicsSceneMouseEvent,
     ) -> None:
         """Open an inline dialog to edit the transition label."""
         new_label, ok = QInputDialog.getText(
@@ -168,7 +165,11 @@ class TransitionItem(QGraphicsItem):
             )
 
     def _paint_arrow_head(
-        self, painter: QPainter, tip: QPointF, ux: float, uy: float,
+        self,
+        painter: QPainter,
+        tip: QPointF,
+        ux: float,
+        uy: float,
     ) -> None:
         # Perpendicular normal for the arrow wings.
         px, py = -uy, ux

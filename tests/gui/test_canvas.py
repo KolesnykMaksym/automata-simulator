@@ -106,7 +106,8 @@ class TestStateItem:
         assert centre.y() == 70.0
 
     def test_rename_updates_label_when_label_mirrors_id(
-        self, scene: AutomatonScene,
+        self,
+        scene: AutomatonScene,
     ) -> None:
         a = scene.add_state(0.0, 0.0, state_id="q0")
         assert a.label == "q0"

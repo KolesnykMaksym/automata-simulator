@@ -215,9 +215,7 @@ class SimulationPanel(QWidget):
         if isinstance(step, DFAStep):
             pairs = {(step.from_state, step.to_state)}
         else:
-            pairs = {
-                (src, tgt) for src in step.from_states for tgt in step.to_states
-            }
+            pairs = {(src, tgt) for src in step.from_states for tgt in step.to_states}
         for tr_item in self._scene.transition_items():
             is_active = (tr_item.source.state_id, tr_item.target.state_id) in pairs
             tr_item.set_highlighted(is_active)

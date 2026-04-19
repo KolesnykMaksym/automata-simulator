@@ -40,9 +40,7 @@ class TapeView(QWidget):
         self._tapes = [(tuple(cells), head) for cells, head in tapes]
         tape_count = max(1, len(self._tapes))
         needed_height = int(
-            _MARGIN * 2
-            + _CELL_HEIGHT * tape_count
-            + _TAPE_GAP * max(0, tape_count - 1),
+            _MARGIN * 2 + _CELL_HEIGHT * tape_count + _TAPE_GAP * max(0, tape_count - 1),
         )
         self.setMinimumHeight(needed_height)
         self.update()

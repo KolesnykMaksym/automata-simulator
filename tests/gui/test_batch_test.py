@@ -106,7 +106,9 @@ class TestBatchTestDialog:
         assert isinstance(payload[0]["accepted"], bool)
 
     def test_raises_on_scene_without_initial(
-        self, qtbot: QtBot, scene: AutomatonScene,
+        self,
+        qtbot: QtBot,
+        scene: AutomatonScene,
     ) -> None:
         scene.add_state(0.0, 0.0)  # no initial marker
         dialog = BatchTestDialog(scene)

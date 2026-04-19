@@ -166,10 +166,7 @@ class BatchTestDialog(QDialog):
         except SceneConversionError as exc:
             QMessageBox.warning(self, self.tr("Scene error"), str(exc))
             return
-        lines = [
-            line.rstrip("\r\n")
-            for line in self._input_edit.toPlainText().splitlines()
-        ]
+        lines = [line.rstrip("\r\n") for line in self._input_edit.toPlainText().splitlines()]
         self._results = self._simulate(automaton, lines)
         self._populate_table(self._results)
         accepted = sum(1 for r in self._results if r.accepted)
@@ -182,7 +179,9 @@ class BatchTestDialog(QDialog):
         )
 
     def _simulate(
-        self, automaton: Automaton, inputs: list[str],
+        self,
+        automaton: Automaton,
+        inputs: list[str],
     ) -> list[BatchResult]:
         sim = _simulator_for(automaton)
         rows: list[BatchResult] = []
@@ -223,7 +222,9 @@ class BatchTestDialog(QDialog):
             return
         default_name = "batch-report." + fmt
         path_str, _ = QFileDialog.getSaveFileName(
-            self, self.tr("Export report"), default_name,
+            self,
+            self.tr("Export report"),
+            default_name,
         )
         if not path_str:
             return

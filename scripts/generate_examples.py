@@ -129,16 +129,25 @@ def tm_bit_inverter() -> Automaton:
         accepting_states=["halt"],
         transitions=[
             TMTransition(
-                source="q0", target="q0",
-                read=("0",), write=("1",), move=(TapeMove.RIGHT,),
+                source="q0",
+                target="q0",
+                read=("0",),
+                write=("1",),
+                move=(TapeMove.RIGHT,),
             ),
             TMTransition(
-                source="q0", target="q0",
-                read=("1",), write=("0",), move=(TapeMove.RIGHT,),
+                source="q0",
+                target="q0",
+                read=("1",),
+                write=("0",),
+                move=(TapeMove.RIGHT,),
             ),
             TMTransition(
-                source="q0", target="halt",
-                read=(DEFAULT_BLANK,), write=(DEFAULT_BLANK,), move=(TapeMove.STAY,),
+                source="q0",
+                target="halt",
+                read=(DEFAULT_BLANK,),
+                write=(DEFAULT_BLANK,),
+                move=(TapeMove.STAY,),
             ),
         ],
     )

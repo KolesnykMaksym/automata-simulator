@@ -37,7 +37,9 @@ class AddStateCommand(QUndoCommand):
         """Create the state (or re-add the previously removed instance)."""
         if self._item is None:
             self._item = self._scene.add_state(
-                self._x, self._y, state_id=self._state_id,
+                self._x,
+                self._y,
+                state_id=self._state_id,
             )
             self._state_id = self._item.state_id
         else:
@@ -76,7 +78,9 @@ class AddTransitionCommand(QUndoCommand):
         """Insert (or re-insert) the transition."""
         if self._item is None:
             self._item = self._scene.add_transition(
-                self._source, self._target, self._label,
+                self._source,
+                self._target,
+                self._label,
             )
         else:
             self._scene.addItem(self._item)
@@ -106,9 +110,7 @@ class RemoveStateCommand(QUndoCommand):
     def redo(self) -> None:
         """Detach and hide the state + every incident transition."""
         self._incident = [
-            tr
-            for tr in self._scene.transition_items()
-            if self._state in (tr.source, tr.target)
+            tr for tr in self._scene.transition_items() if self._state in (tr.source, tr.target)
         ]
         self._scene.remove_state(self._state)
 

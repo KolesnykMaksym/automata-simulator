@@ -127,7 +127,9 @@ class TestSimulationPanel:
         assert panel.simulator is None
 
     def test_highlight_follows_active_state(
-        self, qtbot: QtBot, scene: AutomatonScene,
+        self,
+        qtbot: QtBot,
+        scene: AutomatonScene,
     ) -> None:
         _wire_dfa_ab(scene)
         panel = SimulationPanel(scene)
@@ -135,13 +137,13 @@ class TestSimulationPanel:
         panel._input_edit.setText("ab")
         panel.step_once()
         # Expect q1 to be highlighted now (active state after reading 'a').
-        highlighted_ids = [
-            s.state_id for s in scene.state_items() if s._highlighted
-        ]
+        highlighted_ids = [s.state_id for s in scene.state_items() if s._highlighted]
         assert "q1" in highlighted_ids
 
     def test_epsilon_nfa_runs_with_nfa_simulator(
-        self, qtbot: QtBot, scene: AutomatonScene,
+        self,
+        qtbot: QtBot,
+        scene: AutomatonScene,
     ) -> None:
         a = scene.add_state(0.0, 0.0, state_id="q0")
         b = scene.add_state(100.0, 0.0, state_id="q1")
@@ -156,7 +158,9 @@ class TestSimulationPanel:
         assert panel.simulator.verdict is Verdict.ACCEPTED
 
     def test_missing_initial_shows_error(
-        self, qtbot: QtBot, scene: AutomatonScene,
+        self,
+        qtbot: QtBot,
+        scene: AutomatonScene,
     ) -> None:
         scene.add_state(0.0, 0.0)  # no initial marker
         panel = SimulationPanel(scene)

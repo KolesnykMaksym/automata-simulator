@@ -64,7 +64,9 @@ class TestViewZoom:
 # ------------------------------------------------------------ library
 class TestLibraryPanel:
     def test_populate_from_directory(
-        self, qtbot: QtBot, tmp_path: Path,
+        self,
+        qtbot: QtBot,
+        tmp_path: Path,
     ) -> None:
         (tmp_path / "a.json").write_text("{}")
         (tmp_path / "b.jff").write_text("<x/>")
@@ -85,7 +87,9 @@ class TestLibraryPanel:
         assert len(entries) == 2
 
     def test_load_signal_emits_on_double_click(
-        self, qtbot: QtBot, tmp_path: Path,
+        self,
+        qtbot: QtBot,
+        tmp_path: Path,
     ) -> None:
         (tmp_path / "one.json").write_text("{}")
         panel = LibraryPanel(examples_dir=tmp_path)

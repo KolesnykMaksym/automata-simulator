@@ -83,7 +83,10 @@ class AutomatonView(QGraphicsView):
             self.reset_zoom()
             return
         margins = items_rect.adjusted(
-            -_FIT_MARGIN, -_FIT_MARGIN, _FIT_MARGIN, _FIT_MARGIN,
+            -_FIT_MARGIN,
+            -_FIT_MARGIN,
+            _FIT_MARGIN,
+            _FIT_MARGIN,
         )
         self.fitInView(margins, Qt.AspectRatioMode.KeepAspectRatio)
         # Recompute cumulative zoom from the transform.

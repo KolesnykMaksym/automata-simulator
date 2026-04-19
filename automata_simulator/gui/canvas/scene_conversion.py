@@ -30,7 +30,9 @@ class SceneConversionError(ValueError):
 
 
 def scene_to_automaton(  # noqa: PLR0912 — single-pass scene walker is clearest
-    scene: AutomatonScene, *, name: str = "scene",
+    scene: AutomatonScene,
+    *,
+    name: str = "scene",
 ) -> Automaton:
     """Lower ``scene`` into a core :class:`Automaton` model.
 

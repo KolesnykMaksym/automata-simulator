@@ -168,7 +168,9 @@ class AutomatonScene(QGraphicsScene):
             self._finish_transition_draft()
             if target is not None:
                 label, ok = QInputDialog.getText(
-                    None, "New transition", "Label:",
+                    None,
+                    "New transition",
+                    "Label:",
                 )
                 if ok:
                     self.add_transition(source, target, label)
