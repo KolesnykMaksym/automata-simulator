@@ -10,6 +10,9 @@ os.environ.setdefault("QT_QPA_PLATFORM", "offscreen")
 
 pytest.importorskip("pytestqt")
 
+from pathlib import Path
+
+from PySide6.QtWidgets import QMessageBox
 from pytestqt.qtbot import QtBot
 
 from automata_simulator.gui.i18n import Locale
@@ -42,6 +45,28 @@ class TestMainWindowStructure:
         assert window.current_locale is Locale.EN
         assert window.action_lang_en.isChecked()
         assert not window.action_lang_ua.isChecked()
+
+
+class TestFileLoad:
+    def test_load_path_populates_scene(self, window: MainWindow) -> None:
+        window.load_path(Path("examples/dfa_contains_abb.json"))
+        ids = {s.state_id for s in window.canvas_view.automaton_scene.state_items()}
+        assert ids == {"q0", "q1", "q2", "q3"}
+        assert "dfa_contains_abb.json" in window.windowTitle()
+
+    def test_load_path_on_missing_file_is_graceful(
+        self,
+        window: MainWindow,
+        monkeypatch: pytest.MonkeyPatch,
+    ) -> None:
+        # QMessageBox.warning would run a modal loop; stub it out.
+        def _swallow_warning(*_args: object, **_kw: object) -> QMessageBox.StandardButton:
+            return QMessageBox.StandardButton.Ok
+
+        monkeypatch.setattr(QMessageBox, "warning", _swallow_warning)
+        window.load_path(Path("/does/not/exist.json"))
+        # Scene remains empty.
+        assert window.canvas_view.automaton_scene.state_items() == []
 
 
 class TestLanguageSwitch:

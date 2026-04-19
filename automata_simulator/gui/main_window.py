@@ -11,11 +11,14 @@ runs on every ``QEvent.LanguageChange``.
 
 from __future__ import annotations
 
+from pathlib import Path
+
 from PySide6.QtCore import QEvent, Qt
 from PySide6.QtGui import QAction, QActionGroup, QKeySequence, QUndoStack
 from PySide6.QtWidgets import (
     QApplication,
     QDockWidget,
+    QFileDialog,
     QMainWindow,
     QMenu,
     QMessageBox,
@@ -24,6 +27,7 @@ from PySide6.QtWidgets import (
 )
 
 from automata_simulator import __version__
+from automata_simulator.core.io import load_jff, load_json, save_jff, save_json
 from automata_simulator.core.models import Automaton
 from automata_simulator.gui.canvas import (
     AutomatonView,
@@ -43,12 +47,32 @@ from automata_simulator.gui.i18n import Locale, apply_locale
 from automata_simulator.gui.panels import SimulationPanel
 
 
+def _read_automaton(path: Path) -> Automaton:
+    suffix = path.suffix.lower()
+    if suffix == ".json":
+        return load_json(path)
+    if suffix in {".jff", ".xml"}:
+        return load_jff(path)
+    raise ValueError(f"Unsupported extension: {suffix!r} (use .json, .jff or .xml)")
+
+
+def _write_automaton(automaton: Automaton, path: Path) -> None:
+    suffix = path.suffix.lower()
+    if suffix == ".json":
+        save_json(automaton, path)
+    elif suffix == ".jff":
+        save_jff(automaton, path)
+    else:
+        raise ValueError(f"Unsupported extension: {suffix!r} (use .json or .jff)")
+
+
 class MainWindow(QMainWindow):
     """Shell for the editor — empty at this stage, GUI wiring lands later."""
 
     def __init__(self, parent: QWidget | None = None) -> None:
         super().__init__(parent)
         self._current_locale: Locale = Locale.EN
+        self._current_path: Path | None = None
         self._canvas_view = AutomatonView()
         self.setCentralWidget(self._canvas_view)
         self._undo_stack = QUndoStack(self)
@@ -85,12 +109,16 @@ class MainWindow(QMainWindow):
         # File menu
         self.action_new = QAction(self)
         self.action_new.setShortcut(QKeySequence.StandardKey.New)
+        self.action_new.triggered.connect(self._new_file)
         self.action_open = QAction(self)
         self.action_open.setShortcut(QKeySequence.StandardKey.Open)
+        self.action_open.triggered.connect(self._open_file)
         self.action_save = QAction(self)
         self.action_save.setShortcut(QKeySequence.StandardKey.Save)
+        self.action_save.triggered.connect(self._save_file)
         self.action_save_as = QAction(self)
         self.action_save_as.setShortcut(QKeySequence.StandardKey.SaveAs)
+        self.action_save_as.triggered.connect(self._save_file_as)
         self.action_quit = QAction(self)
         self.action_quit.setShortcut(QKeySequence.StandardKey.Quit)
         self.action_quit.triggered.connect(self.close)
@@ -262,6 +290,67 @@ class MainWindow(QMainWindow):
 
         self.menu_help.setTitle(self.tr("&Help"))
         self.action_about.setText(self.tr("&About"))
+
+    # ------------------------------------------------------------ file handlers
+    def _new_file(self) -> None:
+        """Clear the canvas and forget the current file path."""
+        self._canvas_view.automaton_scene.clear_automaton()
+        self._undo_stack.clear()
+        self._current_path = None
+        self.setWindowTitle(self.tr("Automata Simulator"))
+
+    def _open_file(self) -> None:
+        """Prompt for a ``.json`` / ``.jff`` file and load it into the scene."""
+        path_str, _ = QFileDialog.getOpenFileName(
+            self,
+            self.tr("Open automaton"),
+            str(Path.cwd() / "examples"),
+            "Automata (*.json *.jff *.xml);;All files (*)",
+        )
+        if not path_str:
+            return
+        self.load_path(Path(path_str))
+
+    def load_path(self, path: Path) -> None:
+        """Load an automaton from ``path`` into the scene (public for tests)."""
+        try:
+            automaton = _read_automaton(path)
+        except (OSError, ValueError) as exc:
+            QMessageBox.warning(self, self.tr("Open failed"), str(exc))
+            return
+        automaton_to_scene(automaton, self._canvas_view.automaton_scene)
+        self._undo_stack.clear()
+        self._current_path = path
+        self.setWindowTitle(f"{path.name} — {self.tr('Automata Simulator')}")
+
+    def _save_file(self) -> None:
+        if self._current_path is None:
+            self._save_file_as()
+            return
+        self._write_scene_to(self._current_path)
+
+    def _save_file_as(self) -> None:
+        path_str, _ = QFileDialog.getSaveFileName(
+            self,
+            self.tr("Save automaton"),
+            str(self._current_path or Path.cwd() / "automaton.json"),
+            "JSON (*.json);;JFLAP (*.jff)",
+        )
+        if not path_str:
+            return
+        path = Path(path_str)
+        self._write_scene_to(path)
+        self._current_path = path
+        self.setWindowTitle(f"{path.name} — {self.tr('Automata Simulator')}")
+
+    def _write_scene_to(self, path: Path) -> None:
+        automaton = self._current_automaton()
+        if automaton is None:
+            return
+        try:
+            _write_automaton(automaton, path)
+        except (OSError, ValueError) as exc:
+            QMessageBox.warning(self, self.tr("Save failed"), str(exc))
 
     # ------------------------------------------------------------ algorithms
     def _current_automaton(self) -> Automaton | None:
