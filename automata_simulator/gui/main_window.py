@@ -44,8 +44,10 @@ from automata_simulator.gui.dialogs import (
     RemoveEpsilonDialog,
 )
 from automata_simulator.gui.i18n import Locale, apply_locale
-from automata_simulator.gui.panels import SimulationPanel
+from automata_simulator.gui.panels import LibraryPanel, SimulationPanel
 from automata_simulator.gui.theme import Theme, apply_theme
+
+EXAMPLES_DIR = Path(__file__).resolve().parent.parent.parent / "examples"
 
 
 def _read_automaton(path: Path) -> Automaton:
@@ -84,6 +86,18 @@ class MainWindow(QMainWindow):
             Qt.DockWidgetArea.RightDockWidgetArea | Qt.DockWidgetArea.LeftDockWidgetArea,
         )
         self.addDockWidget(Qt.DockWidgetArea.RightDockWidgetArea, self._sim_dock)
+
+        # Library panel (left): bundled examples + recently opened files.
+        self._library_panel = LibraryPanel(
+            examples_dir=EXAMPLES_DIR if EXAMPLES_DIR.is_dir() else None,
+        )
+        self._library_panel.load_requested.connect(self.load_path)
+        self._library_dock = QDockWidget(self)
+        self._library_dock.setWidget(self._library_panel)
+        self._library_dock.setAllowedAreas(
+            Qt.DockWidgetArea.LeftDockWidgetArea | Qt.DockWidgetArea.RightDockWidgetArea,
+        )
+        self.addDockWidget(Qt.DockWidgetArea.LeftDockWidgetArea, self._library_dock)
         self._build_actions()
         self._build_menu_bar()
         self.setStatusBar(QStatusBar(self))
@@ -148,6 +162,23 @@ class MainWindow(QMainWindow):
         self.action_dark_theme.setCheckable(True)
         self.action_dark_theme.toggled.connect(self._toggle_dark_theme)
 
+        # View → zoom + fit actions
+        self.action_zoom_in = QAction(self)
+        # Ctrl+= mirrors Cmd+= on macOS where ZoomIn is Cmd+Shift+=.
+        self.action_zoom_in.setShortcuts(
+            [QKeySequence(QKeySequence.StandardKey.ZoomIn), QKeySequence("Ctrl+=")],
+        )
+        self.action_zoom_in.triggered.connect(self._canvas_view.zoom_in)
+        self.action_zoom_out = QAction(self)
+        self.action_zoom_out.setShortcut(QKeySequence.StandardKey.ZoomOut)
+        self.action_zoom_out.triggered.connect(self._canvas_view.zoom_out)
+        self.action_zoom_reset = QAction(self)
+        self.action_zoom_reset.setShortcut(QKeySequence("Ctrl+0"))
+        self.action_zoom_reset.triggered.connect(self._canvas_view.reset_zoom)
+        self.action_zoom_fit = QAction(self)
+        self.action_zoom_fit.setShortcut(QKeySequence("Ctrl+9"))
+        self.action_zoom_fit.triggered.connect(self._canvas_view.fit_in_view)
+
         # Simulation menu
         self.action_sim_run = QAction(self)
         self.action_sim_step = QAction(self)
@@ -199,6 +230,11 @@ class MainWindow(QMainWindow):
         self.menu_view.addMenu(self.menu_language)
         self.menu_view.addSeparator()
         self.menu_view.addAction(self.action_dark_theme)
+        self.menu_view.addSeparator()
+        self.menu_view.addAction(self.action_zoom_in)
+        self.menu_view.addAction(self.action_zoom_out)
+        self.menu_view.addAction(self.action_zoom_reset)
+        self.menu_view.addAction(self.action_zoom_fit)
         menubar.addMenu(self.menu_view)
 
         self.menu_sim = QMenu(self)
@@ -291,6 +327,12 @@ class MainWindow(QMainWindow):
         self.action_lang_en.setText(self.tr("English"))
         self.action_lang_ua.setText(self.tr("Ukrainian"))
         self.action_dark_theme.setText(self.tr("&Dark theme"))
+        self.action_zoom_in.setText(self.tr("Zoom &in"))
+        self.action_zoom_out.setText(self.tr("Zoom &out"))
+        self.action_zoom_reset.setText(self.tr("Actual size"))
+        self.action_zoom_fit.setText(self.tr("Fit to window"))
+        self._library_dock.setWindowTitle(self.tr("Library"))
+        self._library_panel.retranslate_ui()
 
         self.menu_sim.setTitle(self.tr("&Simulation"))
         self.action_sim_run.setText(self.tr("&Run"))
@@ -342,6 +384,9 @@ class MainWindow(QMainWindow):
         self._undo_stack.clear()
         self._current_path = path
         self.setWindowTitle(f"{path.name} — {self.tr('Automata Simulator')}")
+        self._library_panel.add_entry(path)
+        self._library_panel.select_path(path)
+        self._canvas_view.fit_in_view()
 
     def _save_file(self) -> None:
         if self._current_path is None:

@@ -17,6 +17,8 @@ from PySide6.QtWidgets import (
     QHBoxLayout,
     QLabel,
     QLineEdit,
+    QListWidget,
+    QListWidgetItem,
     QPushButton,
     QSlider,
     QVBoxLayout,
@@ -36,6 +38,7 @@ from automata_simulator.gui.canvas import (
     SceneConversionError,
     scene_to_automaton,
 )
+from automata_simulator.gui.panels.test_presets import presets_for
 
 _BASE_INTERVAL_MS: int = 500
 _SLIDER_MIN: int = -20
@@ -61,6 +64,12 @@ class SimulationPanel(QWidget):
     def _build_ui(self) -> None:
         self._input_edit = QLineEdit()
         self._input_edit.setPlaceholderText(self.tr("Input string…"))
+
+        self._presets_label = QLabel()
+        self._presets_list = QListWidget()
+        self._presets_list.setMaximumHeight(140)
+        self._presets_list.itemActivated.connect(self._apply_preset)
+        self._presets_list.itemDoubleClicked.connect(self._apply_preset)
 
         self._run_button = QPushButton()
         self._step_button = QPushButton()
@@ -89,11 +98,17 @@ class SimulationPanel(QWidget):
 
         layout = QVBoxLayout(self)
         layout.addWidget(self._input_edit)
+        layout.addWidget(self._presets_label)
+        layout.addWidget(self._presets_list)
         layout.addLayout(buttons)
         layout.addWidget(self._speed_label)
         layout.addWidget(self._speed_slider)
         layout.addWidget(self._status_label)
         layout.addStretch(1)
+
+        # Populate presets once at startup and whenever the scene structure changes.
+        self._refresh_presets()
+        self._scene.structure_changed.connect(self._refresh_presets)
 
     def retranslate_ui(self) -> None:
         """Re-apply localised strings after a language change."""
@@ -102,6 +117,8 @@ class SimulationPanel(QWidget):
         self._pause_button.setText(self.tr("&Pause"))
         self._reset_button.setText(self.tr("R&eset"))
         self._speed_label.setText(self.tr("Speed"))
+        self._presets_label.setText(self.tr("Quick inputs:"))
+        self._input_edit.setPlaceholderText(self.tr("Input string…"))
         if self._simulator is None:
             self._status_label.setText(self.tr("Ready"))
 
@@ -210,6 +227,25 @@ class SimulationPanel(QWidget):
             state_item.set_highlighted(False)
         for tr_item in self._scene.transition_items():
             tr_item.set_highlighted(False)
+
+    def _apply_preset(self, item: QListWidgetItem) -> None:
+        """Copy a preset entry into the input field."""
+        stored = item.data(Qt.ItemDataRole.UserRole)
+        self._input_edit.setText(stored if isinstance(stored, str) else item.text())
+        self._input_edit.setFocus()
+
+    def _refresh_presets(self) -> None:
+        """Repopulate the preset list based on the current scene automaton."""
+        self._presets_list.clear()
+        try:
+            automaton = scene_to_automaton(self._scene)
+        except SceneConversionError:
+            return
+        strings = presets_for(automaton.name, automaton.type)
+        for text in strings:
+            item = QListWidgetItem(text if text else "(ε)")
+            item.setData(Qt.ItemDataRole.UserRole, text)
+            self._presets_list.addItem(item)
 
     def _on_speed_changed(self, raw: int) -> None:
         factor = 2.0 ** (raw / 4.0)  # slider -20…20 → 2^(-5)…2^5 ≈ 0.03×–32×
