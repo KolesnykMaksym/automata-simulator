@@ -1,10 +1,14 @@
 # Automata Simulator
 
-> Сучасний open-source симулятор автоматів — заміна JFLAP для навчання теорії
-> формальних мов.
+> Сучасний open-source симулятор автоматів — заміна JFLAP для навчання
+> теорії формальних мов.
 >
 > A modern open-source automata simulator — a JFLAP replacement for formal
 > language theory courses.
+
+[![CI](https://github.com/kolesnyk-maksym/automata-simulator/actions/workflows/ci.yml/badge.svg)](https://github.com/kolesnyk-maksym/automata-simulator/actions/workflows/ci.yml)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
+[![Python 3.11+](https://img.shields.io/badge/python-3.11%2B-blue.svg)](https://www.python.org/)
 
 ---
 
@@ -21,10 +25,13 @@
 
 ### Можливості
 
-- Редактор з drag-and-drop станів і переходів (PySide6).
+- Drag-and-drop редактор із темною темою (PySide6).
 - Покрокова симуляція з анімацією активних станів, стрічки (TM) і стеку (PDA).
+- Трекпад-first навігація: pinch-to-zoom, двопальцевий свайп — пан.
+- Ліва панель-бібліотека зі всіма відкритими автоматами + прикладами.
+- Швидкі тест-рядки (preset inputs) для кожного типу автомата.
 - Алгоритми: `NFA→DFA`, `ε-NFA→NFA`, мінімізація Хопкрофта, Regex↔NFA
-  (Томпсон / state elimination), CFG↔PDA, перевірка еквівалентності.
+  (Томпсон / state elimination), CFG↔PDA.
 - Пакетне тестування з експортом CSV/JSON-звітів.
 - Імпорт/експорт JFLAP `.jff`, власний JSON, Graphviz DOT/SVG/PNG.
 - Двомовний UI (українська / англійська), runtime-перемикач.
@@ -38,10 +45,17 @@ automata-sim        # GUI
 automata --help     # CLI
 ```
 
-### Етап розробки
+### Гарячі клавіші GUI
 
-Проєкт у стадії активної розробки. Поточний етап — **Етап 0 (Bootstrap)** —
-див. `CLAUDE.md`, розділ 9.
+| Дія | macOS | Linux / Windows |
+|---|---|---|
+| Відкрити | ⌘O | Ctrl+O |
+| Зберегти | ⌘S | Ctrl+S |
+| Вмістити у вікно | Ctrl+9 | Ctrl+9 |
+| Збільшити / Зменшити | ⌘= / ⌘- | Ctrl+= / Ctrl+- |
+| 100% масштаб | Ctrl+0 | Ctrl+0 |
+| Undo / Redo | ⌘Z / ⇧⌘Z | Ctrl+Z / Ctrl+Y |
+| Вийти | ⌘Q | Ctrl+Q |
 
 ---
 
@@ -58,16 +72,19 @@ simulating, visualising and transforming the classical automaton models:
 
 ### Features
 
-- Drag-and-drop editor for states and transitions (PySide6).
+- Drag-and-drop editor with light/dark themes (PySide6).
 - Step-by-step simulation with animated active states, tape (TM) and stack (PDA).
+- Trackpad-first navigation: pinch-to-zoom, two-finger swipe pans.
+- Left library dock listing opened files + bundled examples.
+- Quick-pick test strings per automaton kind.
 - Algorithms: `NFA→DFA`, `ε-NFA→NFA`, Hopcroft minimization, Regex↔NFA
-  (Thompson / state elimination), CFG↔PDA, equivalence checking.
+  (Thompson / state elimination), CFG↔PDA.
 - Batch testing with CSV/JSON report export.
 - JFLAP `.jff` import/export, native JSON format, Graphviz DOT/SVG/PNG.
 - Bilingual UI (Ukrainian / English), runtime switchable.
 - CLI for headless operation and a Docker image.
 
-### Installation
+### Install
 
 ```bash
 pip install automata-simulator
@@ -75,10 +92,17 @@ automata-sim        # GUI
 automata --help     # CLI
 ```
 
-### Development status
+### CLI quick reference
 
-Active development. Current phase — **Stage 0 (Bootstrap)** — see `CLAUDE.md`,
-section 9.
+```bash
+automata simulate examples/dfa_contains_abb.json -i "aabbabb"
+automata simulate examples/dfa_contains_abb.json -i "aabbabb" --step
+automata convert examples/nfa_ends_in_abb.json --to dfa -o dfa.json
+automata minimize dfa.json -o min.json
+automata batch-test examples/pda_a_n_b_n.json \
+    --strings tests.txt --report report.csv
+automata export dfa.json --format dot -o diagram.dot
+```
 
 ### Development setup
 
@@ -88,10 +112,18 @@ source .venv/bin/activate
 uv pip install -e ".[dev]"
 pre-commit install
 pytest
+mypy
 ```
+
+Docs site (`mkdocs serve`), Docker build (`docker build -t automata-simulator .`)
+and PyInstaller bundles (`pyinstaller packaging/automata-sim.spec --clean`) are
+all wired through GitHub Actions — see
+[`.github/workflows/`](.github/workflows/).
+
+See [CONTRIBUTING.md](CONTRIBUTING.md) for the full contribution guide.
 
 ---
 
 ## License
 
-MIT — see [LICENSE](LICENSE) (to be added in Stage 16).
+MIT — see [LICENSE](LICENSE).

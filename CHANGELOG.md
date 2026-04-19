@@ -6,6 +6,43 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 Commit messages follow [Conventional Commits](https://www.conventionalcommits.org/).
 
+## [0.2.0] - 2026-04-19
+
+Post-0.1.0 GUI polish — editor quality-of-life upgrades.
+
+### Added
+
+- **File menu wired up:** New / Open… / Save / Save As… load and save
+  native JSON or JFLAP ``.jff`` files. Title bar reflects the active
+  file; ``load_path()`` is exposed publicly for scripting.
+- **Dark theme:** View → Dark theme toggles between light and dark
+  palettes instantly. Canvas items read the palette on every paint
+  cycle, so states, transitions, tape and stack follow the theme.
+- **Inline transition labels:** creating a transition via Shift-drag
+  prompts for the label immediately; double-clicking an existing
+  transition reopens the dialog to edit it.
+- **Trackpad-friendly navigation:** plain wheel / two-finger swipe
+  pans the viewport, pinch gestures zoom via
+  ``QNativeGestureEvent``, Ctrl+wheel zooms on keyboards without a
+  trackpad. Public ``zoom_in`` / ``zoom_out`` / ``reset_zoom`` /
+  ``fit_in_view`` drive new View-menu shortcuts (Cmd+=, Cmd+-,
+  Ctrl+0, Ctrl+9) and ``load_path()`` auto-fits new documents.
+- **Library dock (left):** ``LibraryPanel`` auto-populates from
+  ``examples/`` on start, accumulates every File → Open, dedups and
+  bumps the most recent entry to the top, emits ``load_requested``
+  on double-click / Enter so the canvas follows.
+- **Simulation input presets:** a "Quick inputs:" list below the
+  input field offers curated test strings. Lookup is
+  name-first (bundled examples get tailored suggestions) and
+  type-second (any DFA / NFA / PDA / TM / Mealy / Moore still gets a
+  sensible default). Manual input remains available.
+
+### Fixed
+
+- ``DictTranslator`` now falls back to the source text when a key is
+  missing from ``TRANSLATIONS_UA`` — previously an empty translation
+  collapsed the Ukrainian menu bar to blank entries.
+
 ## [0.1.0] - 2026-04-19
 
 First public release.
