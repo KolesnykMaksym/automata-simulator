@@ -28,6 +28,7 @@ TRANSLATIONS_UA: dict[str, str] = {
     # View menu
     "&View": "&Вигляд",
     "&Language": "&Мова",
+    "&Dark theme": "&Темна тема",
     "English": "English",
     "Ukrainian": "Українська",
     # Simulation menu

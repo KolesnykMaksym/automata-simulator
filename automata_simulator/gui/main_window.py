@@ -45,6 +45,7 @@ from automata_simulator.gui.dialogs import (
 )
 from automata_simulator.gui.i18n import Locale, apply_locale
 from automata_simulator.gui.panels import SimulationPanel
+from automata_simulator.gui.theme import Theme, apply_theme
 
 
 def _read_automaton(path: Path) -> Automaton:
@@ -105,7 +106,7 @@ class MainWindow(QMainWindow):
         return self._undo_stack
 
     # ------------------------------------------------------------ menu building
-    def _build_actions(self) -> None:
+    def _build_actions(self) -> None:  # noqa: PLR0915 — flat action construction is clearer
         # File menu
         self.action_new = QAction(self)
         self.action_new.setShortcut(QKeySequence.StandardKey.New)
@@ -141,6 +142,11 @@ class MainWindow(QMainWindow):
         self.action_lang_ua.setCheckable(True)
         self.action_lang_ua.triggered.connect(lambda: self._switch_locale(Locale.UA))
         self.language_group.addAction(self.action_lang_ua)
+
+        # View → Dark theme toggle
+        self.action_dark_theme = QAction(self)
+        self.action_dark_theme.setCheckable(True)
+        self.action_dark_theme.toggled.connect(self._toggle_dark_theme)
 
         # Simulation menu
         self.action_sim_run = QAction(self)
@@ -191,6 +197,8 @@ class MainWindow(QMainWindow):
         self.menu_language.addAction(self.action_lang_en)
         self.menu_language.addAction(self.action_lang_ua)
         self.menu_view.addMenu(self.menu_language)
+        self.menu_view.addSeparator()
+        self.menu_view.addAction(self.action_dark_theme)
         menubar.addMenu(self.menu_view)
 
         self.menu_sim = QMenu(self)
@@ -242,6 +250,17 @@ class MainWindow(QMainWindow):
         # Python-subclassed translator, so re-apply strings explicitly.
         self.retranslate_ui()
 
+    def _toggle_dark_theme(self, enabled: bool) -> None:
+        app = QApplication.instance()
+        if not isinstance(app, QApplication):
+            return
+        apply_theme(app, Theme.DARK if enabled else Theme.LIGHT)
+        # Re-tint the canvas background to match.
+        scene = self._canvas_view.automaton_scene
+        scene.setBackgroundBrush(app.palette().base())
+        for item in scene.items():
+            item.update()
+
     # ------------------------------------------------------------ retranslate
     def changeEvent(self, event: QEvent) -> None:  # noqa: N802 — Qt override
         """Handle Qt events; refresh strings on ``LanguageChange``."""
@@ -271,6 +290,7 @@ class MainWindow(QMainWindow):
         self.menu_language.setTitle(self.tr("&Language"))
         self.action_lang_en.setText(self.tr("English"))
         self.action_lang_ua.setText(self.tr("Ukrainian"))
+        self.action_dark_theme.setText(self.tr("&Dark theme"))
 
         self.menu_sim.setTitle(self.tr("&Simulation"))
         self.action_sim_run.setText(self.tr("&Run"))

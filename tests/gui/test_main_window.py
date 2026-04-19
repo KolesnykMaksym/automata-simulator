@@ -12,7 +12,8 @@ pytest.importorskip("pytestqt")
 
 from pathlib import Path
 
-from PySide6.QtWidgets import QMessageBox
+from PySide6.QtGui import QPalette
+from PySide6.QtWidgets import QApplication, QMessageBox
 from pytestqt.qtbot import QtBot
 
 from automata_simulator.gui.i18n import Locale
@@ -67,6 +68,27 @@ class TestFileLoad:
         window.load_path(Path("/does/not/exist.json"))
         # Scene remains empty.
         assert window.canvas_view.automaton_scene.state_items() == []
+
+
+class TestTheme:
+    def test_dark_theme_changes_palette(self, window: MainWindow) -> None:
+        window.action_dark_theme.setChecked(True)
+        dark_window = QApplication.palette().color(QPalette.ColorRole.Window)
+        # Dark window background must be darker than the light one.
+        assert dark_window.lightnessF() < 0.3
+        window.action_dark_theme.setChecked(False)
+        light_window = QApplication.palette().color(QPalette.ColorRole.Window)
+        assert light_window.lightnessF() > 0.7
+
+
+class TestTransitionLabel:
+    def test_set_label_updates_stored_value(self, window: MainWindow) -> None:
+        scene = window.canvas_view.automaton_scene
+        a = scene.add_state(0.0, 0.0, state_id="a")
+        b = scene.add_state(100.0, 0.0, state_id="b")
+        tr = scene.add_transition(a, b, label="x")
+        tr.set_label("y")
+        assert tr.label == "y"
 
 
 class TestLanguageSwitch:

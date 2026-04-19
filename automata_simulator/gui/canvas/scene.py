@@ -167,7 +167,11 @@ class AutomatonScene(QGraphicsScene):
             source = self._pending_source
             self._finish_transition_draft()
             if target is not None:
-                self.add_transition(source, target)
+                label, ok = QInputDialog.getText(
+                    None, "New transition", "Label:",
+                )
+                if ok:
+                    self.add_transition(source, target, label)
                 event.accept()
                 return
         super().mouseReleaseEvent(event)

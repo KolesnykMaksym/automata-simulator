@@ -12,11 +12,15 @@ from __future__ import annotations
 from PySide6.QtCore import QPointF, QRectF, Qt
 from PySide6.QtGui import QBrush, QColor, QFont, QPainter, QPen, QPolygonF
 from PySide6.QtWidgets import (
+    QApplication,
     QGraphicsItem,
     QGraphicsSceneMouseEvent,
     QStyleOptionGraphicsItem,
     QWidget,
 )
+
+_HIGHLIGHT_FILL = QColor("#ffd85c")
+_SELECTED_PEN = QColor("#3478f6")
 
 STATE_RADIUS: float = 30.0
 _ACCEPTING_INNER_GAP: float = 5.0
@@ -121,21 +125,24 @@ class StateItem(QGraphicsItem):
         self,
         painter: QPainter,
         option: QStyleOptionGraphicsItem,  # noqa: ARG002 — Qt callback shape
-        widget: QWidget | None = None,  # noqa: ARG002 — Qt callback shape
+        widget: QWidget | None = None,
     ) -> None:
         """Draw the state circle, label, optional double ring and initial arrow."""
         painter.setRenderHint(QPainter.RenderHint.Antialiasing)
+        palette = widget.palette() if widget is not None else QApplication.palette()
+        base_fill = palette.base().color()
+        text_colour = palette.windowText().color()
         outer = QRectF(
             -self._radius,
             -self._radius,
             self._radius * 2,
             self._radius * 2,
         )
-        fill_colour = QColor("#ffd85c") if self._highlighted else QColor("#ffffff")
+        fill_colour = _HIGHLIGHT_FILL if self._highlighted else base_fill
         painter.setBrush(QBrush(fill_colour))
-        pen = QPen(QColor("#222222"), 2.0)
+        pen = QPen(text_colour, 2.0)
         if self.isSelected():
-            pen.setColor(QColor("#3478f6"))
+            pen.setColor(_SELECTED_PEN)
             pen.setWidthF(2.8)
         painter.setPen(pen)
         painter.drawEllipse(outer)
@@ -143,14 +150,15 @@ class StateItem(QGraphicsItem):
             inner_r = self._radius - _ACCEPTING_INNER_GAP
             painter.drawEllipse(QRectF(-inner_r, -inner_r, inner_r * 2, inner_r * 2))
         if self._is_initial:
-            self._draw_initial_arrow(painter)
+            self._draw_initial_arrow(painter, text_colour)
+        painter.setPen(text_colour)
         painter.setFont(QFont("Helvetica", 11))
         painter.drawText(outer, Qt.AlignmentFlag.AlignCenter, self._label)
 
-    def _draw_initial_arrow(self, painter: QPainter) -> None:
+    def _draw_initial_arrow(self, painter: QPainter, colour: QColor) -> None:
         tail_x = -self._radius - _INITIAL_ARROW_LENGTH
         tip_x = -self._radius
-        painter.setPen(QPen(QColor("#222222"), 2.0))
+        painter.setPen(QPen(colour, 2.0))
         painter.drawLine(QPointF(tail_x, 0.0), QPointF(tip_x, 0.0))
         arrow = QPolygonF(
             [
@@ -159,7 +167,7 @@ class StateItem(QGraphicsItem):
                 QPointF(tip_x - 8.0, 5.0),
             ],
         )
-        painter.setBrush(QBrush(QColor("#222222")))
+        painter.setBrush(QBrush(colour))
         painter.drawPolygon(arrow)
 
     # ------------------------------------------------------------ interaction

@@ -14,9 +14,19 @@ import math
 
 from PySide6.QtCore import QPointF, QRectF, Qt
 from PySide6.QtGui import QBrush, QColor, QFont, QPainter, QPen, QPolygonF
-from PySide6.QtWidgets import QGraphicsItem, QStyleOptionGraphicsItem, QWidget
+from PySide6.QtWidgets import (
+    QApplication,
+    QGraphicsItem,
+    QGraphicsSceneMouseEvent,
+    QInputDialog,
+    QStyleOptionGraphicsItem,
+    QWidget,
+)
 
 from automata_simulator.gui.canvas.state_item import StateItem
+
+_HIGHLIGHT_COLOUR = QColor("#ff8c00")
+_SELECTED_COLOUR = QColor("#3478f6")
 
 _ARROW_HEAD_LENGTH: float = 10.0
 _ARROW_HEAD_WIDTH: float = 6.0
@@ -83,18 +93,37 @@ class TransitionItem(QGraphicsItem):
         self,
         painter: QPainter,
         option: QStyleOptionGraphicsItem,  # noqa: ARG002
-        widget: QWidget | None = None,  # noqa: ARG002
+        widget: QWidget | None = None,
     ) -> None:
         """Draw the line/arrow/loop and render the label."""
         painter.setRenderHint(QPainter.RenderHint.Antialiasing)
-        pen_colour = QColor("#ff8c00") if self._highlighted else QColor("#222222")
+        palette = widget.palette() if widget is not None else QApplication.palette()
+        pen_colour = (
+            _HIGHLIGHT_COLOUR
+            if self._highlighted
+            else palette.windowText().color()
+        )
         if self.isSelected():
-            pen_colour = QColor("#3478f6")
+            pen_colour = _SELECTED_COLOUR
         painter.setPen(QPen(pen_colour, 2.0))
         if self._source is self._target:
             self._paint_self_loop(painter)
         else:
             self._paint_arrow(painter)
+
+    def mouseDoubleClickEvent(  # noqa: N802 — Qt override
+        self, event: QGraphicsSceneMouseEvent,
+    ) -> None:
+        """Open an inline dialog to edit the transition label."""
+        new_label, ok = QInputDialog.getText(
+            None,
+            "Edit transition",
+            "Label:",
+            text=self._label,
+        )
+        if ok:
+            self.set_label(new_label)
+        event.accept()
 
     def _paint_self_loop(self, painter: QPainter) -> None:
         centre = self._source.centre()
