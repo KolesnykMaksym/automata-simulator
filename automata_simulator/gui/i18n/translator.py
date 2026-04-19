@@ -34,13 +34,18 @@ class DictTranslator(QTranslator):
 
     def translate(
         self,
-        context: str,
+        context: str,  # noqa: ARG002 — Qt callback shape
         source_text: str,
         disambiguation: str | None = None,  # noqa: ARG002 — Qt callback shape
         n: int = -1,  # noqa: ARG002 — Qt callback shape
     ) -> str:
-        """Return the Ukrainian rendering of ``source_text`` or ``""`` if missing."""
-        return self._mapping.get(source_text, "")
+        """Return the Ukrainian rendering of ``source_text`` or the source as fallback.
+
+        PySide6 treats an empty return as a valid (empty) translation — so we
+        must fall back to the source text when a key is missing, otherwise
+        every un-translated widget silently loses its label.
+        """
+        return self._mapping.get(source_text, source_text)
 
 
 _CURRENT_TRANSLATOR: QTranslator | None = None
